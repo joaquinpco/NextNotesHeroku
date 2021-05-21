@@ -1,0 +1,15 @@
+version: "2"
+services:
+  golang:
+    container_name: docker-golang
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8080"
+    environment:
+      PORT: 8080
+    volumes:
+      - ./:/go/src/github.com/nextnotes
+volumes:
+    nextnotes:
