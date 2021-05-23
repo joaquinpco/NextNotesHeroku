@@ -15,6 +15,7 @@ type Note struct {
 	Name   string `json:"Name"`
 	Colour string `json:"Colour"`
 	Text   string `json:"Text"`
+	UserId string `json:"UserId"`
 }
 
 func getClientFirestore() (context.Context, *firestore.Client) {
@@ -42,8 +43,21 @@ func Notes(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		id := r.URL.Query().Get("id")
+		userId := r.URL.Query().Get("userId")
 
-		if id != "" {
+		if id != "" && userId != "" {
+			result, err := client.Collection("notes").Where(
+				"UserId", "==", userId,
+			).Where(
+				"__name__", "==", id,
+			).Documents(ctx).GetAll()
+			if err != nil {
+				log.Fatalf("Fatality: %v", err)
+				return
+			}
+			json.NewEncoder(w).Encode(result)
+			return
+		} else if id != "" {
 			result, err := client.Collection("notes").Doc(id).Get(ctx)
 			if err != nil {
 				log.Fatalf("Fatality: %v", err)
@@ -51,7 +65,18 @@ func Notes(w http.ResponseWriter, r *http.Request) {
 			}
 			json.NewEncoder(w).Encode(result.Data())
 			return
+		} else if userId != "" {
+			result, err := client.Collection("notes").Where(
+				"UserId", "==", userId,
+			).Documents(ctx).GetAll()
+			if err != nil {
+				log.Fatalf("Fatality: %v", err)
+				return
+			}
+			json.NewEncoder(w).Encode(result)
+			return
 		}
+
 		result, err := client.Collection("notes").Documents(ctx).GetAll()
 		if err != nil {
 			log.Fatalf("Fatality: %v", err)
