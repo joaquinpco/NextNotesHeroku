@@ -38,8 +38,13 @@ func getClientFirestore() (context.Context, *firestore.Client) {
 	return ctx, client
 }
 
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
+
 func Notes(w http.ResponseWriter, r *http.Request) {
 	ctx, client := getClientFirestore()
+	enableCors(&w)
 
 	switch r.Method {
 	case http.MethodGet:
