@@ -8,6 +8,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
 
@@ -45,44 +46,46 @@ func Notes(w http.ResponseWriter, r *http.Request) {
 		id := r.URL.Query().Get("id")
 		userId := r.URL.Query().Get("userId")
 
+		var documents []map[string]interface{}
+
 		if id != "" && userId != "" {
-			result, err := client.Collection("notes").Where(
+			iter := client.Collection("notes").Where(
 				"UserId", "==", userId,
 			).Where(
 				"__name__", "==", id,
-			).Documents(ctx).GetAll()
-			if err != nil {
-				log.Fatalf("Fatality: %v", err)
-				return
+			).Documents(ctx)
+			for {
+				doc, err := iter.Next()
+				if err == iterator.Done {
+					break
+				}
+				if err != nil {
+					log.Fatalf("Fatality: %v", err)
+				}
+				var m map[string]interface{}
+				doc.DataTo(&m)
+				m["ID"] = doc.Ref.ID
+				documents = append(documents, m)
 			}
-			json.NewEncoder(w).Encode(result)
-			return
-		} else if id != "" {
-			result, err := client.Collection("notes").Doc(id).Get(ctx)
-			if err != nil {
-				log.Fatalf("Fatality: %v", err)
-				return
-			}
-			json.NewEncoder(w).Encode(result.Data())
-			return
 		} else if userId != "" {
-			result, err := client.Collection("notes").Where(
+			iter := client.Collection("notes").Where(
 				"UserId", "==", userId,
-			).Documents(ctx).GetAll()
-			if err != nil {
-				log.Fatalf("Fatality: %v", err)
-				return
+			).Documents(ctx)
+			for {
+				doc, err := iter.Next()
+				if err == iterator.Done {
+					break
+				}
+				if err != nil {
+					log.Fatalf("Fatality: %v", err)
+				}
+				var m map[string]interface{}
+				doc.DataTo(&m)
+				m["ID"] = doc.Ref.ID
+				documents = append(documents, m)
 			}
-			json.NewEncoder(w).Encode(result)
-			return
 		}
-
-		result, err := client.Collection("notes").Documents(ctx).GetAll()
-		if err != nil {
-			log.Fatalf("Fatality: %v", err)
-			return
-		}
-		json.NewEncoder(w).Encode(result)
+		json.NewEncoder(w).Encode(documents)
 	case http.MethodPost:
 		note := Note{}
 		err := json.NewDecoder(r.Body).Decode(&note)
