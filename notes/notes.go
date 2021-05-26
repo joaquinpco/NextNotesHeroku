@@ -40,8 +40,6 @@ func getClientFirestore() (context.Context, *firestore.Client) {
 
 func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-    (*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-    (*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 }
 
 func Notes(w http.ResponseWriter, r *http.Request) {
@@ -143,6 +141,8 @@ func Notes(w http.ResponseWriter, r *http.Request) {
 		} else {
 			http.Error(w, "404 - Not found", http.StatusNotFound)
 		}
+	case http.MethodOptions:
+		return
 	default:
 		// http.Error(w, "403 - Forbidden", http.StatusForbidden)
 		http.Error(w, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
