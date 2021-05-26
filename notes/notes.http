@@ -1,5 +1,5 @@
 @host = http://localhost:8001
-@noteIdExample = ryGMskRpupTcqZ20deb0
+@noteIdExample = 0D2r88GvIQTlgzGWkDRJ
 @userId = 1
 
 GET {{host}}/notes?userId={{userId}} HTTP/1.1
