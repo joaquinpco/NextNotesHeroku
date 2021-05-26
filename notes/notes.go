@@ -141,6 +141,8 @@ func Notes(w http.ResponseWriter, r *http.Request) {
 		} else {
 			http.Error(w, "404 - Not found", http.StatusNotFound)
 		}
+	case http.MethodOptions:
+		return
 	default:
 		// http.Error(w, "403 - Forbidden", http.StatusForbidden)
 		http.Error(w, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
