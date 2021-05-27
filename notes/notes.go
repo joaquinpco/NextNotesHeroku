@@ -1,15 +1,12 @@
 package notes
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 	"net/http"
+	"nextnotes/utils"
 
-	"cloud.google.com/go/firestore"
-	firebase "firebase.google.com/go"
 	"google.golang.org/api/iterator"
-	"google.golang.org/api/option"
 )
 
 type Note struct {
@@ -19,34 +16,9 @@ type Note struct {
 	UserId string `json:"UserId"`
 }
 
-func getClientFirestore() (context.Context, *firestore.Client) {
-	ctx := context.Background()
-	var app *firebase.App
-	var err error
-
-	sa := option.WithCredentialsFile("credentials.json")
-	app, err = firebase.NewApp(ctx, nil, sa)
-
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	client, err := app.Firestore(ctx)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return ctx, client
-}
-
-func enableCors(w *http.ResponseWriter) {
-	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-    (*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-    (*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-}
-
 func Notes(w http.ResponseWriter, r *http.Request) {
-	ctx, client := getClientFirestore()
-	enableCors(&w)
+	ctx, client := utils.GetClientFirestore()
+	utils.EnableCors(&w)
 
 	switch r.Method {
 	case http.MethodGet:
