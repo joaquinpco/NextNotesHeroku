@@ -10,16 +10,14 @@ import (
 	"google.golang.org/api/option"
 )
 
-func GetFirebaseApp() (*firebase.App, error) {
-	ctx := context.Background()
+func GetFirebaseApp(ctx context.Context) (*firebase.App, error) {
 	sa := option.WithCredentialsFile("credentials.json")
 	app, err := firebase.NewApp(ctx, nil, sa)
 	return app, err
 }
 
-func GetClientFirestore() (context.Context, *firestore.Client) {
-	ctx := context.Background()
-	app, err := GetFirebaseApp()
+func GetClientFirestore(ctx context.Context) *firestore.Client {
+	app, err := GetFirebaseApp(ctx)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -29,7 +27,7 @@ func GetClientFirestore() (context.Context, *firestore.Client) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return ctx, client
+	return client
 }
 
 func EnableCors(w *http.ResponseWriter) {

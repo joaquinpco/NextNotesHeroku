@@ -5,13 +5,11 @@ import (
 	"log"
 	"net/http"
 	"nextnotes/notes"
-	"nextnotes/notifications"
 	"os"
 )
 
 func main() {
 	http.HandleFunc("/notes", notes.Notes)
-	http.HandleFunc("/notifications", notifications.Notifications)
 
 	var port string
 	var isset bool

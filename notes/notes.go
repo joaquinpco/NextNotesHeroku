@@ -1,6 +1,7 @@
 package notes
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -17,7 +18,8 @@ type Note struct {
 }
 
 func Notes(w http.ResponseWriter, r *http.Request) {
-	ctx, client := utils.GetClientFirestore()
+	ctx := context.Background()
+	client := utils.GetClientFirestore(ctx)
 	utils.EnableCors(&w)
 
 	switch r.Method {
